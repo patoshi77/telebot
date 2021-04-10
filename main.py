@@ -3,7 +3,6 @@ TOKEN='1762560403:AAGWkC57kJgn-LXbTVeo7E43wLS0M2St818'
 import os
 
 PORT = int(os.environ.get('PORT', 5000))
-#!/usr/bin/env python
 # pylint: disable=W0613, C0116
 # type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
