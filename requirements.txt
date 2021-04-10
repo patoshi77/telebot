@@ -1,1 +1,4 @@
 python-telegram-bot==12.7
+requests==2.7
+mysql-connector-python==8.0
+
