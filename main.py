@@ -9,6 +9,10 @@ from telegram import Update,InlineKeyboardButton,InlineKeyboardMarkup,ReplyKeybo
 from telegram.ext import Updater,CommandHandler,CallbackQueryHandler,ConversationHandler,MessageHandler,CallbackContext,Filters
 coin=requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C24h%2C7d")
 coingecko=coin.json()
+TOKEN='1762560403:AAGWkC57kJgn-LXbTVeo7E43wLS0M2St818'
+import os
+
+PORT = int(os.environ.get('PORT', 5000))
 admin='1093222544'
 #conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
 #cursor = conn.cursor()
@@ -1220,7 +1224,13 @@ def main():
     updater.dispatcher.add_handler(CallbackQueryHandler(depot_ltc,pattern="^27$"))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🇫🇷Francais$"), francais))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🏴󠁧󠁢󠁥󠁮󠁧󠁿english"), english))
-    updater.start_polling()
+    updater.start_webhook(listen="0.0.0.0",
+
+                          port=int(PORT),
+
+                          url_path=TOKEN)
+
+    updater.bot.setWebhook('https://wmcurrency.herokuapp.com/' + TOKEN)
     
     print('working...')
     updater.idle()
