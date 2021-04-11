@@ -1,8 +1,6 @@
 
 import os
 PORT = int(os.environ.get('PORT', 5000))
-
-# Enable logging
 import requests
 import mysql.connector
 from telegram.utils import helpers
@@ -11,49 +9,75 @@ import time
 import random
 from telegram import Update,InlineKeyboardButton,InlineKeyboardMarkup,ReplyKeyboardMarkup,ReplyKeyboardRemove,ParseMode
 from telegram.ext import Updater,CommandHandler,CallbackQueryHandler,ConversationHandler,MessageHandler,CallbackContext,Filters
+
+# Enable logging
+TOKEN='1762560403:AAGWkC57kJgn-LXbTVeo7E43wLS0M2St818'
+conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
 coin=requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C24h%2C7d")
 coingecko=coin.json()
 admin='1093222544'
-TOKEN='1762560403:AAGWkC57kJgn-LXbTVeo7E43wLS0M2St818'
+#conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+#cursor = conn.cursor()
 conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
 cursor = conn.cursor()
-
-def rbtc(bt,cid):
+conn.close()
+print('close')
+adresseb,montantb=range(2)
+adressee,montante=range(2)
+adressel,montantl=range(2)
+msg=range(1)
+def rbtc(bt,c1d):
+    conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+    cursor = conn.cursor()
     cursor.execute("""
 UPDATE wmc
 SET btc=%s
 WHERE cid=%s    
     """,(bt,cid,))
+    conn.close()
+    
 def reth(bt,cid):
+    conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+    cursor = conn.cursor()
     cursor.execute("""
 UPDATE wmc
 SET eth=%s
 WHERE cid=%s    
     """,(bt,cid,)
     )
+    conn.close()
 def rltc(bt,cid):
+    conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+    cursor = conn.cursor()
     cursor.execute("""
 UPDATE wmc
 SET ltc=%s
 WHERE cid=%s    
     """,(bt,cid,)
     )
+    conn.close()
 def rtikets(bt,cid):
+    conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+    cursor = conn.cursor()
     cursor.execute("""
 UPDATE wmc
 SET tikets=%s
 WHERE cid=%s    
     """,(bt,cid,)
     )
+    conn.close()
 
 
 def row(cid):
+    conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+    cursor = conn.cursor()
     
     cursor.execute("""
 SELECT * FROM wmc WHERE cid=%s 
     """,(cid ,))
     row=cursor.fetchall()
     row=row[0]
+    conn.close()
     return row
 def litecoin():
     for i in coingecko:
@@ -68,33 +92,58 @@ def start(update:Update,context:CallbackContext):
     mid=update.message.message_id
     data=(cid, name , dt , mid)
     try:
+        conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+        cursor = conn.cursor()
         cursor.execute("""
         INSERT INTO wmc (cid,nom,date,mid) VALUE (%s , %s ,%s , %s )""",data)
+        conn.close()
     except:
+        update.message.reply_text('select the language',reply_markup=ReplyKeyboardMarkup([['🇫🇷Francais','🏴󠁧󠁢󠁥󠁮󠁧󠁿english']],resize_keyboard='true'))
+
         cid=update.message.chat.id
         mid=update.message.message_id
-
+        conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+        cursor = conn.cursor()
         cursor.execute("""
         UPDATE wmc
         SET mid=%s
         WHERE cid=%s""",(mid,cid,))
-        update.message.reply_text('select the language',reply_markup=ReplyKeyboardMarkup([['🇫🇷Francais','🏴󠁧󠁢󠁥󠁮󠁧󠁿english']],resize_keyboard='true'))
-        context.bot.sendMessage(text='hu',chat_id=admin)
-    else:
-    	cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
+        conn.close()
 
-    	gt=update.message.text[13:25]
-    	update.message.reply_text('select the language',reply_markup=ReplyKeyboardMarkup([['🇫🇷Francais','🏴󠁧󠁢󠁥󠁮󠁧󠁿english']],resize_keyboard='true'))
-    	try:
-    	 context.bot.sendMessage(text='➕ vous avez un nouveau refferal 🎉\n\n'
- 'bonus : +1🎟',chat_id=gt)
-    	 bt=row(cid)[6]+1
-    	 rtikets(bt,gt)
-    	except:
-    		time.sleep(0.00000000000001)
+        context.bot.sendMessage(text=f'nouvel utilisateur + {row(cid)[0]}',chat_id=admin)
+    else:
+        gt=update.message.text[13:25]
+        update.message.reply_text('select the language', reply_markup=ReplyKeyboardMarkup([['🇫🇷Francais','🏴󠁧󠁢󠁥󠁮󠁧󠁿english']],resize_keyboard='true'))
+        context.bot.sendMessage(text=f'nouvel utilisateur  {row(cid)[0]}',chat_id=admin)
+
+        
+        try:
+                    bt=row(gt)[6]
+                    bt=bt+1
+                    rtikets(bt,gt)
+                    ref=row(gt)[19]
+                    ref=ref+1
+                    conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+                    cursor = conn.cursor()
+                    cursor.execute("""
+UPDATE wmc
+SET reff=%s
+WHERE cid=%s""",(ref,gt))
+
+
+                    conn.close()
+                    context.bot.sendMessage(text='➕ vous avez un nouveau referral 🎉\n\n'
+            'bonus : +1🎟',chat_id=gt)     
+        except:
+        	time.sleep(0.00000000000001)
+        	
+
+    		       
+        
+        
+        
+        
+            
     	
     		
 
@@ -119,7 +168,7 @@ f"     ♦️ choisissez celle qui vous convient\n"
 f"ainsi vous recevez des cryptomonaies dont le retrait\n"
 f"se fait en cliquant sur le bouton '👛Retrait'\n"
 f"contactez le support en cas de soucis:💬support\n"
-f"sur le fonctionnement du bot",reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮megeboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.MARKDOWN)
+f"sur le fonctionnement du bot",reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.MARKDOWN)
 
 
 def english(update:Update,context:CallbackContext):
@@ -134,25 +183,25 @@ def distributeur(update:Update,context:CallbackContext):
                         em3='❌'
                         em4='❌'
                         em5='❌'
-                    elif plan=='v1':
+                    elif plan=='V1':
                         em1='❌'
                         em2='✅'
                         em3='❌'
                         em4='❌'
                         em5='❌'
-                    elif plan=='v2':
+                    elif plan=='V2':
                         em1='❌'
                         em2='❌'
                         em3='✅'
                         em4='❌'
                         em5='❌'
-                    elif plan=='pro':
+                    elif plan=='PRO':
                         em1='❌'
                         em2='❌'
                         em3='❌'
                         em4='✅'
                         em5='❌'
-                    elif plan=='promax':
+                    elif plan=='PROMAX':
                         em1='❌'
                         em2='❌'
                         em3='❌'
@@ -244,8 +293,9 @@ f"     ♦️ choisissez celle qui vous convient\n"
 f"ainsi vous recevez des cryptomonaies dont le retrait\n"
 f"se fait en cliquant sur le bouton '👛Retrait'\n"
 f"contactez le support en cas de soucis:💬support\n"
-f"sur le fonctionnement du bot",reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮megeboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.MARKDOWN
+f"sur le fonctionnement du bot",reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.MARKDOWN
 )
+    return ConversationHandler.END
     
 def eth(update:Update,context:CallbackContext):
     cid=update.callback_query.message.chat.id
@@ -461,16 +511,16 @@ f"🕶id:wmc{update.message.chat.id}\n"
 f"❄️solde bitcoin : {row(cid)[7]}btc\n"
 f"❄️solde litecoin: {row(cid)[9]}ltc\n"
 f"❄️solde ethereum: {row(cid)[8]}eth\n"
-f"🎟tikets :{row(cid)[6]}🎟\n"
-f"📋plan : {row(cid)[5]}\n"
+f"🎟tikets : {row(cid)[6]}🎟\n"
+f"📋plan :  {row(cid)[5]}\n"
 f"💰total retiré:\n"
 f"  🏮bitcoin : {row(cid)[10]}btc\n"
 f"  🏮ethereum: {row(cid)[11]}eth\n"
 f"  🏮litecoin: {row(cid)[12]}ltc\n"
 f"💳total deposé:\n"
-f"  🏮bitcoin : {round(row(cid)[13],6)}btc\n"
-f"  🏮ethereum: {round(row(cid)[14],6)}eth\n"
-f"  🏮litecoin: {round(row(cid)[15],6)}ltc\n</code>"
+f"  🏮bitcoin : {row(cid)[13]}btc\n"
+f"  🏮ethereum: {row(cid)[14]}eth\n"
+f"  🏮litecoin: {row(cid)[15]}ltc\n</code>"
 ,reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('🏦Dépot',callback_data="4")]]),parse_mode=ParseMode.HTML
     )
 
@@ -480,17 +530,17 @@ def depot(update:Update,context:CallbackContext):
 f"🙋‍♂️Pour recharger votre compte \n"
 f"vous avez 3 options a savoir:\n"
 f"🔴dépôt bitcoin:\n"
-f"▫️dépôt min:0.000001 BTC\n"
+f"▫️dépôt min:0.00025 BTC\n"
 f"▫️addrèsse 👇:\n\n"
 f"\n<code>btc14365dghdstjfvfdeshvG44fS23dF56</code>\n\n\n"
 f"▫️bonus:20%\n"
 f"⚫️dépôt ethereum:\n"
-f"▪️▪️dépôt min:0.000001 ETH\n"
+f"▪️▪️dépôt min:0.008 ETH\n"
 f"▪️▪️addrèsse 👇:\n\n" 
 f"\n<code>eth14365dvG44hdjkthfqxbilufS23dF56</code>\n\n\n"
 f"▪️▪️bonus:20%\n"
 f"⚪️dépôt litecoin:\n"
-f"▫️dépôt min:0.000001 LTC\n"
+f"▫️dépôt min:0.075 LTC\n"
 f"▫️addrèsse 👇:\n\n" 
 f"\n<code>ltc14365dvfgusghdggffggG44fS23dF56</code>\n\n\n"
 f"▫️bonus:20%\n"
@@ -499,9 +549,9 @@ f"❗️vous pouvez copier les addrèsses en les selectionents",chat_id=update.c
 
 
     )
-    update.message.reply_text(
+    context.bot.sendMessage(text=''
 "tu veux acceder au menu?👇"
-,reply_markup=ReplyKeyboardMarkup([['🔙RETOUR']],resize_keyboard='true')  )
+,reply_markup=ReplyKeyboardMarkup([['🔙RETOUR']],resize_keyboard='true')  ,chat_id=update.callback_query.message.chat.id)
 def retrait(update:Update,context:CallbackContext):
     context.bot.sendMessage(text=''
 f"selectionner une crytomonaie pour votre retrait"
@@ -510,12 +560,6 @@ chat_id=update.message.chat.id
     )
 def retrait_btc(update:Update,context:CallbackContext):
     cid=update.message.chat.id
-    mid=update.message.message_id
-    cursor.execute("""
-    UPDATE wmc
-    SET mid=%s
-    WHERE cid=%s
-    """,(mid,cid,))
     
     if row(cid)[7]<0.0001:
         
@@ -530,252 +574,235 @@ f"NB❗️:montant min:0.0001 btc"
 " 0.0005 btc ",
 chat_id=update.message.chat.id
 )
+    elif row(cid)[19]<50:
+        context.bot.sendMessage(text=''
+"⚠️Pour effectuer cette transaction vous devez avoir  aumoin "
+" 50 referrals ceci est la derniere etape de votre retrait ",
+chat_id=update.message.chat.id
+)
+
     else:
         cid=update.message.chat.id
-        mid=update.message.message_id
         context.bot.sendMessage(text=''
-"entrez l'addresse bitcoin du destinataire 👇"
+"entrez l'adresse bitcoin du destinataire 👇"
 ,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
 ,chat_id=update.message.chat.id
 
     )
-        while row(cid)[4]==update.message.message_id:
-        	time.sleep(1)
-        	print(str(row(cid)[4])+" "+str(update.message.message_id))
+    return adresseb
+    
+def retrait_btca(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    if len(update.message.text)>28 and row(cid)[7]>=0.0001 and row(cid)[13]>=0.0005 and row(cid)[19]>=50:
 
-        	
-
-        cid=update.message.chat.id
-        mid=update.message.message_id
+        conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+        cursor = conn.cursor()
         cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-        while len(update.message.text)<28 or update.message.text!='❌annuler' :
-                update.message.reply_text("🚫entrez l'addresse bitcoin  valide du destinataire 👇"
+UPDATE wmc
+SET btca=%s
+WHERE cid=%s    
+    """,(update.message.text,cid,)
+    )
+        conn.close()
+
+        context.bot.sendMessage(text=''
+"entrez le montant 👇"
 ,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
-,chat_id=update.message.chat.id)
-                while row(cid)[4]==update.message.message_id :
-                    time.sleep(0.000000000001)
-        cursor.execute("""
-            UPDATE wmc
-            SET btca
-            WHERE cid=%s
-            """,(cid,))	
-        context.bot.sendMessage(
-"🔰entrez le montant!    (min=0.0001 btc)"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],chat_id=update.callback_query.message.chat_id,resize_keyboard='true')
-        )
-        cid=update.message.chat.id
-        mid=update.message.message_id
-        cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-        if row(cid)[4]==update.message.message_id-2:
-                try:
+,chat_id=update.message.chat.id
+
+    )
+    return montantb
+def retrait_btcm(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    try:
                     int(update.message.text)
-                except:
-                    update.message.reply_text(' montant invalide!  requette annnulé',reply_markup=ReplyKeyboardMarkup([['❌annuler']],chat_id=update.callback_query.message.chat_id,resize_keyboard='true'))
-                else :
-
-                    while update.message.text<0.0001 and row(cid)[7]<update.message.text:
-                        update.message.reply_text(
-"🔰entrez le montant! le montant min est 0.0001 btc"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true'))
-
-                        cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-                        while row(cid)[4]==update.message.message_id:
-                            time.sleep(0.000000001)
-                    CD=update.message.text
-                    rt=row(cid)[7]-CD
-                    cursor.execute("""
+    except:
+                    update.message.reply_text("requette annuler",reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'))
+    else :
+        if update.message.text>=0.0001:
+            CD=update.message.text
+            rt=row(cid)[7]-CD
+            cursor.execute("""
                     UPDATE wmc
                     SET btc=%s
                     WHERE cid=%s
                     """,(rt,cid,))
-                    update.message.reply_text(
+
+            context.bot.sendMessage(
 f"🧾 DEMANDE APPOUVEE ✅✅✅\n"
 f"votre retrait est lancé \n:"
-f"🐸somme:{CD} btc\n" 
+f"🐸somme:{update.message.text} btc\n" 
 f"🐸btc  :<code>{row(cid)[16]}</code>\n"
-f"🐸status:✅send\n" 
-,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮megeboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.HTML                  
+f"🐸status:✅send\n" ,chat_id=update.message.chat.id
+,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.HTML                  
                     )
-
-
+        else:
+            update.message.reply_text(' montant insuffisant!  requette annnulé',reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'))
+    return  ConversationHandler.END
 def retrait_eth(update:Update,context:CallbackContext):
-    cid=update.callback_query.message.chat.id
-    if row(cid)[8]<0.001:
+    cid=update.message.chat.id
+    
+    if row(cid)[8]<0.0005:
+        
         context.bot.sendMessage(text=''
 f"⚠️Vous n'avez pas atteint le montant min pour effectuer cette transaction !\n"
-f"NB❗️:montant min:0.001 ETH"
-,chat_id=update.callback_query.message.chat.id
+f"NB❗️:montant min:0.0005 eth"
+,chat_id=update.message.chat.id
     )
-    if row(cid)[14]<0.005:
+    elif row(cid)[14]<0.001:
         context.bot.sendMessage(text=''
 "⚠️Pour effectuer cette transaction vous devez avoir deposés aumoin "
-" 0.005 ETH ",
-chat_id=update.callback_query.message.chat.id
+" 0.001 eth ",
+chat_id=update.message.chat.id
 )
-    else:
-        cid=update.callback_query.message.chat.id
-        mid=update.callback_query.message.message_id
-        cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
+    elif row(cid)[19]<50:
         context.bot.sendMessage(text=''
-"entrez l'addresse bitcoin du destinataire 👇"
+"⚠️Pour effectuer cette transaction vous devez avoir  aumoin "
+" 50 referrals ceci est la derniere etape de votre retrait ",
+chat_id=update.message.chat.id
+)
+
+    else:
+        cid=update.message.chat.id
+        context.bot.sendMessage(text=''
+"entrez l'adresse ethereum du destinataire 👇"
 ,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
-,chat_id=update.callback_query.message.chat.id
+,chat_id=update.message.chat.id
 
     )
-        if row(cid)[4]==update.message.id-2:
-            cid=update.message.chat.id
-            mid=update.message.id
-            cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-            while len(update.message.text)<28 or update.message.text!='❌annuler' :
-                cid=update.message.chat.id
-                mid=update.message.id
-                cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-                context.bot.sendMessage(text=''
-"🚫entrez l'addresse ethereum  valide du destinataire 👇"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
-,chat_id=update.callback_query.message.chat.id)
-                while update.message.id-1==row(cid)[4]:
-                    cursor.execute("""
-        UPDATE wmc
-        SET etha=%s
-        WHERE cid=%s""",(update.message.text,cid,))
-                    update.message.reply_text(
-"🔰entrez le montant!"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
-        )
-        if row(cid)[4]==update.message.id-2:
-            cid=update.message.chat.id
-            while row(cid)[20]<0.001 :
-                cid=update.message.chat.id
-                mid=update.message.id
-                cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-                update.message.reply_text(
-"🔰entrez le montant! le montant min est 0.001 eth"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true'))
-                while update.message.id-1==row(cid)[4]:
-                    time.sleep(1)
-            if row(cid)[9]>=float(update.message.text):
+    return adressee
+def retrait_etha(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    if len(update.message.text)>28 and row(cid)[8]>=0.0005 and row(cid)[14]>=0.001 and row(cid)[19]>=50:
 
-                cursor.execute("""
-        UPDATE wmc
-        SET mt=%s
-        WHERE cid=%s""",(update.message.text,cid,))
-                update.message.reply_text(
+        conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+        cursor = conn.cursor()
+        cursor.execute("""
+UPDATE wmc
+SET etha=%s
+WHERE cid=%s    
+    """,(update.message.text,cid,)
+    )
+        conn.close()
+
+        context.bot.sendMessage(text=''
+"entrez le montant 👇"
+,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
+,chat_id=update.message.chat.id
+
+    )
+    return montante
+def retrait_ethm(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    try:
+                    int(update.message.text)
+    except:
+                    update.message.reply_text("requette annuler",reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'))
+    else :
+        if update.message.text>=0.0005:
+            CD=update.message.text
+            rt=row(cid)[8]-CD
+            cursor.execute("""
+                    UPDATE wmc
+                    SET eth=%s
+                    WHERE cid=%s
+                    """,(rt,cid,))
+
+            context.bot.sendMessage(
 f"🧾 DEMANDE APPOUVEE ✅✅✅\n"
 f"votre retrait est lancé \n:"
-f"🐸somme:{row(cid)[19]} eth\n" 
-f"🐸btc  :<code>{row(cid)[18]}</code>\n"
-f"🐸status:✅send\n" 
-,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮megeboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.HTML          )
-            else:
-                update.message.reply_text("balance litecoin insuffisante",reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮Grandes Taches','💬support 24/7']],resize_keyboard='true'))
-def retrait_ltc(update:Update,context:CallbackContext):
-    cid=update.callback_query.message.chat.id
-    if row(cid)[9]<0.005:
-        context.bot.sendMessage(text=''
-f"⚠️Vous n'avez pas atteint le montant min pour effectuer cette transaction !\n"
-f"NB❗️:montant min:0.005 ltc"
-,chat_id=update.callback_query.message.chat.id
-    )
-    elif row(cid)[15]<0.02:
-        context.bot.sendMessage(text=''
-"⚠️Pour effectuer cette transaction vous devez avoir deposés aumoin "
-" 0.02 ltc ",
-chat_id=update.callback_query.message.chat.id
-)
-    else:
-        cid=update.callback_query.message.chat.id
-        mid=update.callback_query.message.message_id
-        cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-        context.bot.sendMessage(text=''
-"entrez l'addresse litecoin du destinataire 👇"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
-,chat_id=update.callback_query.message.chat.id
-
-    )
-        if row(cid)[4]==update.message.id-2:
-            cid=update.message.chat.id
-            mid=update.message.id
-            cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-            while len(update.message.text)<28 or update.message.text!='❌annuler' :
-                cid=update.message.chat.id
-                mid=update.message.id
-                cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-                context.bot.sendMessage(text=''
-"🚫entrez l'addresse litecoin  valide du destinataire 👇"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
-,chat_id=update.callback_query.message.chat.id)
-                while update.message.id-1==row(cid)[4]:
-                    time.sleep(1)
-            cursor.execute("""
-        UPDATE wmc
-        SET ltca=%s
-        WHERE cid=%s""",(update.message.text,cid,))
-            update.message.reply_text(
-"🔰entrez le montant!"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
-        )
-        if row(update.message.chat.id)[4]==update.message.id-2:
-            while row(update.message.chat.id)[20]<0.005 :
-                cid=update.message.chat.id
-                mid=update.message.id
-                cursor.execute("""
-        UPDATE wmc
-        SET mid=%s
-        WHERE cid=%s""",(mid,cid,))
-                update.message.reply_text(
-"🔰entrez le montant! le montant min est 0.005 ltc"
-,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true'))
-                while update.message.id-1==row(cid)[4]:
-                    time.sleep(1)
-            if row(cid)[9]>=float(update.message.text):
-                cursor.execute("""
-        UPDATE wmc
-        SET mt=%s
-        WHERE cid=%s""",(update.message.text,cid,))
-                update.message.reply_text(
-f"🧾 DEMANDE APPOUVEE ✅✅✅\n"
-f"votre retrait est lancé \n:"
-f"🐸somme:{row(cid)[19]} ltc\n" 
+f"🐸somme:{update.message.text} eth\n" 
 f"🐸btc  :<code>{row(cid)[17]}</code>\n"
-f"🐸status:✅send\n" 
-,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮megeboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.HTML          )
-            else:
-                update.message.reply_text("balance litecoin insuffisante",reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮megeboom bonus','💬support 24/7']],resize_keyboard='true'))
+f"🐸status:✅send\n" ,chat_id=update.message.chat.id
+,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.HTML                  
+                    )
+        else:
+            update.message.reply_text(' montant insuffisant!  requette annnulé',reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'))
+    return ConversationHandler.END
+def retrait_ltc(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    
+    if row(cid)[9]<0.0005:
+        
+        context.bot.sendMessage(text=''
+f"⚠️Vous n'avez pas atteint le montant min pour effectuer cette transaction !\n"
+f"NB❗️:montant min:0.0005 ltc"
+,chat_id=update.message.chat.id
+    )
+    elif row(cid)[15]<0.005:
+        context.bot.sendMessage(text=''
+"⚠️Pour effectuer cette transaction vous devez avoir deposés aumoin "
+" 0.005 ltc ",
+chat_id=update.message.chat.id
+)
+    elif row(cid)[19]<50:
+        context.bot.sendMessage(text=''
+"⚠️Pour effectuer cette transaction vous devez avoir  aumoin "
+" 50 referrals ceci est la derniere étape de votre retrait ",
+chat_id=update.message.chat.id
+)
+
+    else:
+        cid=update.message.chat.id
+        context.bot.sendMessage(text=''
+"entrez l'adresse bitcoin du destinataire 👇"
+,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
+,chat_id=update.message.chat.id
+
+    )
+    return adressel
+def retrait_ltca(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    if len(update.message.text)>28 and row(cid)[7]>=0.0005 and row(cid)[13]>=0.005 and row(cid)[19]>=50:
+
+        conn = mysql.connector.connect(host="sql10.freemysqlhosting.net",user="sql10402965",password="pato.7788", database="sql10402965")
+        cursor = conn.cursor()
+        cursor.execute("""
+UPDATE wmc
+SET ltca=%s
+WHERE cid=%s    
+    """,(update.message.text,cid,)
+    )
+        conn.close()
+
+        context.bot.sendMessage(text=''
+"entrez le montant 👇"
+,reply_markup=ReplyKeyboardMarkup([['❌annuler']],resize_keyboard='true')
+,chat_id=update.message.chat.id
+
+    )
+    return montantl
+def retrait_ltcm(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    try:
+                    int(update.message.text)
+    except:
+                    update.message.reply_text('requette annuler',reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'))
+    else :
+        if update.message.text>=0.0005:
+            CD=update.message.text
+            rt=row(cid)[9]-CD
+            cursor.execute("""
+                    UPDATE wmc
+                    SET ltc=%s
+                    WHERE cid=%s
+                    """,(rt,cid,))
+
+            context.bot.sendMessage(
+f"🧾 DEMANDE APPOUVEE ✅✅✅\n"
+f"votre retrait est lancé \n:"
+f"🐸somme:{update.message.text} ltc\n" 
+f"🐸btc  :<code>{row(cid)[18]}</code>\n"
+f"🐸status:✅send\n" ,chat_id=update.message.chat.id
+,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'),parse_mode=ParseMode.HTML                  
+                    )
+        else:
+            update.message.reply_text(' montant insuffisant!  requette annnulé',reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true'))
+    return ConversationHandler.END
 def annuler(update:Update,context:CallbackContext):
     update.message.reply_text(
 "l 'operation en cour a été arrêtée "
-,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮megeboom bonus','💬support 24/7']],resize_keyboard='true')
+,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true')
     )
 def ameliorer(update:Update,context:CallbackContext):
 	update.message.reply_text(
@@ -785,15 +812,15 @@ f"💎bonus:+10🎟\n"
 f"         +rembourse 2%\n"
 f"👇cliquez sur une cryptomonaie"
 f" pour 💳payez",
-reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="9"),InlineKeyboardButton('ETH',callback_data="10"),InlineKeyboardButton('LTC',callback_data="11")]]) )
+reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="16"),InlineKeyboardButton('ETH',callback_data="20"),InlineKeyboardButton('LTC',callback_data="24")]]) )
 	update.message.reply_text(
 f"👆ameliorez pour le niveau V2\n"
 f"💵prix: $25\n"
-f"💎bonus:+10🎟\n"
-f"         +remboursement 2%\n"
+f"💎bonus:+35🎟\n"
+f"         +remboursement 5%\n"
 f"👇cliquez sur une cryptomonaie"
 f" pour 💳payer",
-reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="9"),InlineKeyboardButton('ETH',callback_data="10"),InlineKeyboardButton('LTC',callback_data="11")]]) )
+reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="17"),InlineKeyboardButton('ETH',callback_data="21"),InlineKeyboardButton('LTC',callback_data="25")]]) )
 	update.message.reply_text(
 f"👆ameliorer pour le niveau PRO\n"
 f"💵prix: $60\n"
@@ -801,7 +828,7 @@ f"💎bonus:+100🎟\n"
 f"         +remboursement 10%\n"
 f"👇cliquez sur une cryptomonaie"
 f" pour 💳payer",
-reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="9"),InlineKeyboardButton('ETH',callback_data="10"),InlineKeyboardButton('LTC',callback_data="11")]])   )
+reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="18"),InlineKeyboardButton('ETH',callback_data="22"),InlineKeyboardButton('LTC',callback_data="26")]])   )
 	update.message.reply_text(
 f"👆ameliorez pour le niveau PROMAX\n"
 f"💵prix: $150\n"
@@ -809,19 +836,23 @@ f"💎bonus:+200🎟\n"
 f"         +remboursement 15%\n"
 f"👇cliquez sur une cryptomonaie"
 f" pour 💳payer",
-reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="9"),InlineKeyboardButton('ETH',callback_data="10"),InlineKeyboardButton('LTC',callback_data="11")]]) )
+reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="19"),InlineKeyboardButton('ETH',callback_data="23"),InlineKeyboardButton('LTC',callback_data="27")]]) )
 	update.message.reply_text(
 "tu veux acceder au menu?👇"
 ,reply_markup=ReplyKeyboardMarkup([['🔙RETOUR']],resize_keyboard='true')  )
  
-def refferal(update:Update,context:CallbackContext):
+def referral(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    reffcount=row(cid)[19]
     update.message.reply_text(
 "Vous disposez d'un lien de parainage "
 "a travers lequel vous recevez des bonus "
-" a travers vos refferals 👥 .Ce lien est le suivant:\n"
+" a travers vos referrals 👥 .Ce lien est le suivant:\n"
 f"🔗lien: <code>{helpers.create_deep_linked_url(context.bot.username,f'winner{update.message.chat.id}')}</code>\n"
-f'👥vous avez deja: 200 refferal(s)\n',parse_mode=ParseMode.HTML
+f'👥vous avez deja: {reffcount} referral(s)\n',parse_mode=ParseMode.HTML
     )
+    
+
 def grandeT(update:Update,context:CallbackContext):
     update.message.reply_text(
 "❓nom de la tache?: MICROBOOM!\n"
@@ -876,47 +907,280 @@ f"🎁🎁vous recevrez +1500🎟  et +50% de votre recharge"
 ,reply_markup=ReplyKeyboardMarkup([['🔙RETOUR']],resize_keyboard='true')   
 )
 def support(update:Update,context:CallbackContext):
-    cid=update.message.chat.id
-    cursor.execute("""
-    UPDATE wmc
-    SET mid=%s
-    WHERE cid=%s
-    """,(update.message.message_id,cid,))
+    
     update.message.reply_text(
 "faites parvenir vos requettes aux administrateurs en envoyent un message"
 ,reply_markup=ReplyKeyboardMarkup([['🔙RETOUR']],resize_keyboard='true')
  ) 
-    if row(cid)[4]==update.message.id-2:
-        context.sendMessage(text=''
-f"{update.message.chat.username} - {update.message.chat.first_name} - <code>{update.message.chat.id}</code>\n"+update.messege.text,
-reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('reply to user',callback_data='14')]])
-,chat_id=admin
-        
-        )
-        update.message.reply_text(
+    return msg
+def support1(update:Update,context:CallbackContext):
+    cid=update.message.chat.id
+    context.bot.sendMessage(
 f"votre requette a bien été envoyée ✅"
-    ,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣Refferal','🛒Ameliorer','👛Retrait'],['🧮megeboom bonus','💬support 24/7']],resize_keyboard='true')    )
+    ,reply_markup=ReplyKeyboardMarkup([['🏦Distributeur','👤Compte'],['🗣referral','🛒Ameliorer','👛Retrait'],['🧮megaboom bonus','💬support 24/7']],resize_keyboard='true')  ,chat_id=cid  )
+
+    context.bot.sendMessage(text=''
+f"{update.message.chat.username} -----<code>{update.message.chat.id}<code>\n"
+f"{update.message.text}"
+,chat_id=admin,parse_mode=ParseMode.HTML
+
+
+    )
+    return ConversationHandler.END
+
+
 def depot_btc(update:Update,context:CallbackContext):
-    context.bot.sendMessage(text=""
-"📮envoyez la somme correspondante a l'addresse suivante pour 🔌activer le plan choisis:\n" 
-"<code>btcuglsljmoezçavlbnolll523heehhd45</code>"   ,parse_mode=ParseMode.HTML,chat_id=update.callbackmessage.chat.id
-    )
+    cid=update.callback_query.message.chat.id
+    cb=update.callback_query
+    callback_data=update.callback_query.data
+    if callback_data=='16':
+        if row(cid)[7]<15/(coingecko[0]['current_price']):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {15/(coingecko[0]['current_price'])} btc "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[7]-(15/(coingecko[0]['current_price']))
+            reth(cd,cid)
+            rtikets(row(cid)[6]+10,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('V1',cid))
+            conn.close()
+
+            cb.answer(text=''
+ "✅effectuer :vous ete en v1"           
+            )
+    elif callback_data=='17':
+        if row(cid)[7]<25/(coingecko[0]['current_price']):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {25/(coingecko[0]['current_price'])} btc "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[7]-(25/(coingecko[0]['current_price']))
+            reth(cd,cid)
+            rtikets(row(cid)[6]+35,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('V2',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en v2"           
+            )
+    elif callback_data=='19':
+        if row(cid)[7]<15/(coingecko[0]['current_price']):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {150/(coingecko[0]['current_price'])} btc "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[7]-(150/(coingecko[0]['current_price']))
+            reth(cd,cid)
+            rtikets(row(cid)[6]+100,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('PROMAX',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en promax"           
+            )
+    elif callback_data=='18':
+        if row(cid)[7]<60/(coingecko[0]['current_price']):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {60/(coingecko[0]['current_price'])} btc "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[7]-(60/(coingecko[0]['current_price']))
+            reth(cd,cid)
+            rtikets(row(cid)[6]+200,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('PRO',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en pro"           
+            )
+    
+
+
+
+    
+   
 def depot_eth(update:Update,context:CallbackContext):
-    context.bot.sendMessage(text=""
-"📮envoyez la somme correspondante a l'addresse suivante pour 🔌activer le plan choisis:\n" 
-"<code>ethuglsljmoezçavlbnolll523heehhd45</code>"   ,parse_mode=ParseMode.HTML,chat_id=update.message.chat.id
-    )
+    cid=update.callback_query.message.chat.id
+    cb=update.callback_query
+    callback_data=update.callback_query.data
+    if callback_data=='20':
+        if row(cid)[8]<15/(coingecko[1]['current_price']):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {15/(coingecko[1]['current_price'])} eth "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[8]-(15/(coingecko[1]['current_price']))
+            reth(cd,cid)
+
+            rtikets(row(cid)[6]+10,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('V1',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en v1"           
+            )
+
+
+    elif callback_data=='23':
+        if row(cid)[8]<150/(coingecko[1]['current_price']):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {150/(coingecko[1]['current_price'])} eth "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[8]-(150/(coingecko[1]['current_price']))
+            reth(cd,cid)
+            rtikets(row(cid)[6]+35,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('PROMAX',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en promax"           
+            )
+    elif callback_data=='21':
+        if row(cid)[8]<25/(coingecko[1]['current_price']):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {25/(coingecko[1]['current_price'])} eth "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[8]-(25/(coingecko[1]['current_price']))
+            reth(cd,cid)
+            rtikets(row(cid)[6]+100,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('V2',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer: vous ete en v2"           
+            )
+    elif callback_data=='22':
+        if row(cid)[8]<60/(coingecko[1]['current_price']):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {60/(coingecko[1]['current_price'])} eth "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[8]-(60/(coingecko[1]['current_price']))
+            reth(cd,cid)
+            rtikets(row(cid)[6]+200,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('PRO',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer: vous ete en pro"           
+            )
+    
 def depot_ltc(update:Update,context:CallbackContext):
-    context.bot.sendMessage(text=""
-"📮envoyez la somme correspondante a l'addresse suivante pour 🔌activer le plan choisis:\n" 
-"<code>ltcuglsljmoezçavlbnolll523heehhd45</code>"   ,parse_mode=ParseMode.HTML,chat_id=update.message.chat.id
-    )
-def retrait1(update:Update,context:CallbackContext):
-	context.bot.sendMessage(text=''
-f"selectionner une crytomonaie pour votre retrait"
-,reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('BTC',callback_data="6"),InlineKeyboardButton('ETH',callback_data="7"),InlineKeyboardButton('LTC',callback_data="8")]]),
-chat_id=update.message.chat.id
-    )
+    cid=update.callback_query.message.chat.id
+    cb=update.callback_query
+    callback_data=update.callback_query.data
+    if callback_data=='24':
+        if row(cid)[9]<15/(litecoin()):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {15/litecoin()} ltc "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[9]-(15/litecoin())
+            rltc(cd,cid)
+            rtikets(row(cid)[6]+10,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('V1',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en v1"           
+            )
+    elif callback_data=='25':
+        if row(cid)[9]<25/(litecoin()):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {25/litecoin()} ltc "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[9]-(25/litecoin())
+            rltc(cd,cid)
+            rtikets(row(cid)[6]+35,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('V2',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en v2"           
+            )
+    elif callback_data=='26':
+        if row(cid)[9]<60/(litecoin()):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {60/litecoin()} ltc "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[9]-(60/litecoin())
+            rltc(cd,cid)
+            rtikets(row(cid)[6]+100,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('PRO',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en pro"           
+            )
+    elif callback_data=='27':
+        if row(cid)[9]<150/(litecoin()):
+            cb.answer(text=''
+ f"⛔️solde insuffisant Il vous faudra {150/litecoin()} ltc "
+ ,show_alert='true'        
+            )
+        else:
+            cd=row(cid)[9]-(150/litecoin())
+            rltc(cd,cid)
+            rtikets(row(cid)[6]+200,cid)
+            cursor.execute("""
+UPDATE wmc
+SET plan=%s
+WHERE cid=%s            
+            """,('PROMAX',cid))
+            conn.close()
+            cb.answer(text=''
+ "✅effectuer :vous ete en promax"           
+            )
+    
 	
 def main():
     updater=Updater('1762560403:AAGWkC57kJgn-LXbTVeo7E43wLS0M2St818')
@@ -924,10 +1188,10 @@ def main():
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^👤Compte$"), compte))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^BTC"), retrait_btc))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🏦Distributeur$"),distributeur))
-    updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🗣Refferal$"), refferal))
+    updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🗣referral$"), referral))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🛒Ameliorer$"),ameliorer))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^👛Retrait$"), retrait))
-    updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🧮megeboom bonus$"), grandeT))
+    updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🧮megaboom bonus$"), grandeT))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^💬support 24/7$"), support))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🔙RETOUR"), retour))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^❌annuler$"), annuler))
@@ -937,11 +1201,44 @@ def main():
     updater.dispatcher.add_handler(CallbackQueryHandler(depot,pattern="^4$"))
     updater.dispatcher.add_handler(CallbackQueryHandler(retrait,pattern="^5$"))
     updater.dispatcher.add_handler(CallbackQueryHandler(retrait_btc,pattern="^6$"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(retrait_ltc,pattern="^7$"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(retrait_eth,pattern="^8$"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(depot_btc,pattern="^9$"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(depot_eth,pattern="^10$"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(depot_ltc,pattern="^11$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(retrait_ltc,pattern="^8$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(retrait_eth,pattern="^7$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_btc,pattern="^16$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_eth,pattern="^20$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_ltc,pattern="^24$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_btc,pattern="^17$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_eth,pattern="^21$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_ltc,pattern="^25$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_btc,pattern="^18$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_eth,pattern="^22$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_ltc,pattern="^26$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_btc,pattern="^19$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_eth,pattern="^23$"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(depot_ltc,pattern="^27$"))
+    updater.dispatcher.add_handler(ConversationHandler(entry_points=[MessageHandler(Filters.regex('^BTC$'),retrait_btc)],
+    states={
+        adresseb : [MessageHandler(Filters.text ,retrait_btca)],
+        montantb : [MessageHandler(Filters.text ,retrait_btcm)],
+    },
+    fallbacks=[MessageHandler(Filters.regex("^❌annuler|🔙RETOUR|BTC|LTC|ETH$"), annuler)]))
+    updater.dispatcher.add_handler(ConversationHandler(entry_points=[MessageHandler(Filters.regex('^ETH$'),retrait_eth)],
+    states={
+        adressee : [MessageHandler(Filters.text ,retrait_etha)],
+        montante : [MessageHandler(Filters.text ,retrait_ethm)],
+    },
+    fallbacks=[MessageHandler(Filters.regex("^❌annuler|🔙RETOUR|BTC|LTC|ETH$"), annuler)]))
+    updater.dispatcher.add_handler(ConversationHandler(entry_points=[MessageHandler(Filters.regex('^LTC$'),retrait_ltc)],
+    states={
+        adressel : [MessageHandler(Filters.text ,retrait_ltca)],
+        montantl : [MessageHandler(Filters.text ,retrait_ltcm)],
+    },
+    fallbacks=[MessageHandler(Filters.regex("^❌annuler|🔙RETOUR|BTC|LTC|ETH$"), annuler)]))
+    updater.dispatcher.add_handler(ConversationHandler(entry_points=[MessageHandler(Filters.regex("^💬support 24/7$"), support)],
+    states={
+        msg : [MessageHandler(Filters.text, support1)],
+        
+    },
+    fallbacks=[MessageHandler(Filters.regex("^🔙RETOUR"), retour)]))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🇫🇷Francais$"), francais))
     updater.dispatcher.add_handler(MessageHandler(Filters.regex("^🏴󠁧󠁢󠁥󠁮󠁧󠁿english"), english))
     dp.add_error_handler(error)
